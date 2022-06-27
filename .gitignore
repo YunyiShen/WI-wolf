@@ -1,3 +1,4 @@
 *.Rhistory
 repeat_Chapron_2016/.Rproj.user/*
 new_Analysis/.Rproj.user/*
+.Rproj.user
