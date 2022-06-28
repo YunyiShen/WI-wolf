@@ -39,7 +39,7 @@ model {
     o_max~uniform(1,10); 
     K ~ lognormal(8,1);
 
-    #linvK ~ normal(0,1000);
+    //linvK ~ normal(0,1000);
 
     // likelihood
     N_t[1] ~ gamma(1e6,1e6); //lognormal(mu_0,sigma_proc);
@@ -53,7 +53,7 @@ model {
         // things about grwoth 
         if(tt < N_year){
             //r_t = beta_0; // growth rate
-            r_t = beta_0 + beta_1 * D_t[tt];
+            r_t = beta_0 + beta_1 * D_t[tt+1];
             //mu_t = log(N_t[tt] * exp(r_t) - gamma * H_t[tt+1]); // exponential grwoth
             
             mu_t = log( N_t[tt] * (1 + (exp(r_t)-1) * (1-N_t[tt]/K) )- gamma * H_t[tt+1]);
