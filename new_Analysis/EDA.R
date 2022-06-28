@@ -17,7 +17,7 @@ par(mfrow = c(2,2))
 plot(year,wolf$Winter.Minimum.Count, ylab = "counts")
 plot(year,wolf_range$Winter.Minimum.Count, ylab = "range")
 plot(year,pack$Winter.Minimum.Count,ylab = "pack counts")
-plot(year,wolf$Winter.Minimum.Count/wolf_range$Winter.Minimum.Count, ylab = "pack density")
+plot(year,wolf$Winter.Minimum.Count/wolf_range$Winter.Minimum.Count, ylab = "population density")
 dev.off()
 
 

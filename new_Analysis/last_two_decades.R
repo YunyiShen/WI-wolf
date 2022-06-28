@@ -13,3 +13,6 @@ polygon(x = c(last_decade$year, rev(last_decade$year)),
         y = c(pred_lm$fit - qt(0.975,pred_lm$df)*pred_lm$se.fit, 
               rev(pred_lm$fit + qt(0.975,pred_lm$df)*pred_lm$se.fit)),
         col =  adjustcolor("black", alpha.f = 0.10), border = NA)
+text(x = 2015, y = 0.0285, # Coordinates
+     label = expression("Density = 0.212-0.000097 * Year\n p=0.13, R^2=0.067"))
+dev.off()
