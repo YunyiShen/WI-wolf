@@ -187,6 +187,10 @@ dev.off()
 likelihood_ratio <- 2*(exponential_mod$opt$value-logistic_mod$opt$value)
 pchisq(likelihood_ratio,1, lower.tail = F, log.p = T)
 
+# check prediction by moving 2015 to 2011:
+sqrt(mean((logistic_mod$pred[(1980:2030)%in% c(2011:2016)] - 
+        wolf$Winter.Minimum.Count[wolf$year %in% c(2015:2020)])^2))/mean(wolf$Winter.Minimum.Count[wolf$year %in% c(2015:2020)])
+
 # is range expansion also logistic?
 logistic_range <- fit_norm_mod(wolf_range$Winter.Minimum.Count[-c(34:41)]
                                , wolf_range$year[-c(34:41)]
@@ -235,6 +239,12 @@ likelihood_ratio_range <- 2*(exponential_range$opt$value-logistic_range$opt$valu
 pchisq(likelihood_ratio_range,1, lower.tail = F, log.p = T)
 
 last_decade <- data.frame(year = 2000:2020, density = (wolf$Winter.Minimum.Count/wolf_range$Winter.Minimum.Count)[year>=2000])
+
+## check predict:
+# check prediction by moving 2015 to 2011:
+sqrt(mean((logistic_range$pred[(1980:2030)%in% c(2011:2016)] - 
+             wolf_range$Winter.Minimum.Count[wolf$year %in% c(2015:2020)])^2))/mean(wolf_range$Winter.Minimum.Count[wolf$year %in% c(2015:2020)])
+
 
 # what's the predicted range capacity? and CI
 1/exp(logistic_range$opt$par[3])
@@ -354,22 +364,5 @@ legend("bottomright",legend = c("observed",
        lty = c(NA,1,NA,2,2), pch = c(1,NA,NA,NA,NA), col = c("black","black",NA,"red","blue"))
 dev.off()
 
-## see if we really have expansion dominated growth 
 
-area_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Range=wolf_range$Winter.Minimum.Count)
-area_pop_lm <- lm(Population~Range-1, area_pop)
-area_pop_pred <- predict(area_pop_lm, se = T)
-
-png("./figs/Pop_vs_range.png", width = 6, height = 3.5, res = 500, unit = "in")
-
-par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
-plot(Population~Range,area_pop)
-abline(area_pop_lm)
-polygon(x = c(area_pop$Range, rev(area_pop$Range)),
-        y = c(area_pop_pred$fit - qt(0.975,area_pop_pred$df)*(area_pop_pred$se.fit), 
-              rev(area_pop_pred$fit + qt(0.975,area_pop_pred$df)*area_pop_pred$se.fit)),
-        col =  adjustcolor("black", alpha.f = 0.10), border = NA)
-text(x = 1e4, y = 800, # Coordinates
-     label = expression("Population = 0.0254 * Range\n p<2e16, R^2=0.99"))
-dev.off()
 

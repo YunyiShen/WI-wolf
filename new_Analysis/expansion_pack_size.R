@@ -1,0 +1,57 @@
+## see if we really have expansion dominated growth 
+area_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Range=wolf_range$Winter.Minimum.Count)
+area_pop_lm <- lm(Population~Range-1, area_pop)
+area_pop_pred <- predict(area_pop_lm, se = T)
+
+png("./figs/Pop_vs_range.png", width = 6, height = 3.5, res = 500, unit = "in")
+
+par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
+plot(Population~Range,area_pop)
+abline(area_pop_lm)
+polygon(x = c(area_pop$Range, rev(area_pop$Range)),
+        y = c(area_pop_pred$fit - qt(0.975,area_pop_pred$df)*(area_pop_pred$se.fit), 
+              rev(area_pop_pred$fit + qt(0.975,area_pop_pred$df)*area_pop_pred$se.fit)),
+        col =  adjustcolor("black", alpha.f = 0.10), border = NA)
+text(x = 1e4, y = 800, # Coordinates
+     label = expression("Population = 0.0254 * Range\n p<2e-16, R^2=0.99"))
+dev.off()
+
+## direct test for stationary of the last two decades
+# this file analyzed the last decades which seems stationary, we determine the effect of harvest
+last_decade <- data.frame(year = 2000:2020-2010, density = (wolf$Winter.Minimum.Count/wolf_range$Winter.Minimum.Count)[year>=2000])
+lmtrend <- lm(density~year,last_decade[-c(13:21),]) # 2012-14 is legal harvest
+lmtrend <- lm(density~year,last_decade) # 2012-14 is legal harvest
+tseries::kpss.test(last_decade$density) # kpss test for stationary, seems stationary
+lm_time <- lm(density~year, last_decade)
+pred_lm <- predict(lm_time,se = T)
+png("./figs/den_last20.png", width = 6, height = 3.5, res = 500, unit = "in")
+par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
+plot(2000:2020, last_decade$density, xlab = "Year", ylab = "Density")
+lines(2000:2020,pred_lm$fit)
+polygon(x = c(last_decade$year+2010, rev(last_decade$year+2010)),
+        y = c(pred_lm$fit - qt(0.975,pred_lm$df)*pred_lm$se.fit, 
+              rev(pred_lm$fit + qt(0.975,pred_lm$df)*pred_lm$se.fit)),
+        col =  adjustcolor("black", alpha.f = 0.10), border = NA)
+text(x = 2014, y = 0.0285, # Coordinates
+     label = expression("Density = 0.0259-9.7e-5 * (Year-2010)\n p=0.13, R^2=0.067"))
+dev.off()
+
+## pack size 
+
+pack_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Pack=pack$Winter.Minimum.Count)
+pack_pop_lm <- lm(Population~Pack-1, pack_pop)
+pack_pop_pred <- predict(pack_pop_lm, se = T)
+
+png("./figs/Pop_vs_pack.png", width = 6, height = 3.5, res = 500, unit = "in")
+par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
+plot(Population~Pack,pack_pop, xlab = "Pack count")
+abline(pack_pop_lm)
+polygon(x = c(pack_pop$Pack, rev(pack_pop$Pack)),
+        y = c(pack_pop_pred$fit - qt(0.975,pack_pop_pred$df)*(pack_pop_pred$se.fit), 
+              rev(pack_pop_pred$fit + qt(0.975,pack_pop_pred$df)*pack_pop_pred$se.fit)),
+        col =  adjustcolor("black", alpha.f = 0.10), border = NA)
+text(x = 70, y = 800, # Coordinates
+     label = expression("Population = 3.78 * Pack\n p<2e-16, R^2=0.99"))
+dev.off()
+
+
