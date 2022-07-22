@@ -1,5 +1,5 @@
 ## see if we really have expansion dominated growth 
-area_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Range=wolf_range$Winter.Minimum.Count)
+area_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Range=wolf_range$Winter.Minimum.Count, area = "WI")
 area_pop_lm <- lm(Population~Range-1, area_pop)
 area_pop_pred <- predict(area_pop_lm, se = T)
 
@@ -55,3 +55,36 @@ text(x = 70, y = 800, # Coordinates
 dev.off()
 
 
+## Also in UP of Michigan
+MI_data <- read.csv("../data/MI_UP_Wolf_Density_overtime_1995_2013.csv")
+plot(N~Area.occupied..km2., MI_data, xlab = "Range", ylab = "Population", ylim = c(0,800))
+MI_lm <- lm(N~Area.occupied..km2., data = MI_data)
+abline(MI_lm)
+summary(MI_lm)
+
+## combine dataset
+
+MI_area_pop <- data.frame(Population = MI_data$N, Range = MI_data$Area.occupied..km2., area = "MI")
+WI_MI_area_pop <- rbind(area_pop, MI_area_pop) |> na.omit()
+
+WI_MI_area_pop <- WI_MI_area_pop[order(WI_MI_area_pop$Range),]
+
+wimi_area_pop_lm <- lm(Population~Range-1, WI_MI_area_pop)
+wimi_area_pop_pred <- predict(wimi_area_pop_lm, se = T)
+
+png("./figs/Pop_vs_range_WI_MI.png", width = 6, height = 3.5, res = 500, unit = "in")
+
+par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
+plot(Population~Range,WI_MI_area_pop)
+points(Population~Range,WI_MI_area_pop[WI_MI_area_pop$area=="MI",], pch = 7)
+abline(wimi_area_pop_lm)
+polygon(x = c(WI_MI_area_pop$Range, rev(WI_MI_area_pop$Range)),
+        y = c(wimi_area_pop_pred$fit - qt(0.975,wimi_area_pop_pred$df)*(wimi_area_pop_pred$se.fit), 
+              rev(wimi_area_pop_pred$fit + qt(0.975,wimi_area_pop_pred$df)*wimi_area_pop_pred$se.fit)),
+        col =  adjustcolor("black", alpha.f = 0.10), border = NA)
+text(x = 1e4, y = 800, # Coordinates
+     label = expression("Population = 0.0243 * Range\n p<2e-16, R^2=0.98"))
+legend("bottomright", legend = c("WI","MI-UP"),pch = c(1,7))
+dev.off()
+
+wimi_area_pop_lm2 <- lm(Population~Range:area+Range, WI_MI_area_pop)
