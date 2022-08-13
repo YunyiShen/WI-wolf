@@ -18,7 +18,7 @@ negloglik_pois <- function(pars, y,t,dd = TRUE){
 }
 
 # fit the Pois model
-fit_pois_mod <- function(y,t,t_new,t0 = 1987,dd = TRUE, se = T, pred_inter = T){
+fit_pois_mod <- function(y,t,t_new,t0 = 1980,dd = TRUE, se = T, pred_inter = T){
   #opt <- optim(c(log(max(y)/min(y))/length(y),log(min(y)),-log(max(y))),negloglik_pois,y = y,t = t-t0, dd = dd, hessian = T)
   #pars <- exp(opt$par)
   if(dd){
@@ -75,7 +75,7 @@ negloglik_gaus <- function(pars, y,t,dd = TRUE){
   -sum(dnorm(y,pred,pars[3+dd],log = TRUE))
 }
 
-fit_norm_mod <- function(y,t,t_new,t0 = 1987,dd = TRUE,se = T, pred_inter = T){
+fit_norm_mod <- function(y,t,t_new,t0 = 1980,dd = TRUE,se = T, pred_inter = T){
   
   if(dd){
     opt <- optim(c(log(max(y)/min(y))/length(y),log(min(y)),-log(max(y)),log(var(y))/2),negloglik_gaus,y = y,t = t-t0, dd = dd, hessian = T)
@@ -121,7 +121,7 @@ fit_norm_mod <- function(y,t,t_new,t0 = 1987,dd = TRUE,se = T, pred_inter = T){
   return(list(opt = opt, pred = pred, se = the_se))
 }
 
-root_3rd_der <- function(r,p0, invK, t0 = 1987){
+root_3rd_der <- function(r,p0, invK, t0 = 1980){
   ap  <- invK * p0
   inside <- sqrt(3) * sqrt(ap^6 - 4 * ap^5 + 6*ap^4 - 4 * ap^3 + ap^2 ) 
   outside <- -2 * ap^3 +4 * ap^2 - 2 * ap

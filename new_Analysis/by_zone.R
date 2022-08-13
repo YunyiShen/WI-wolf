@@ -1,10 +1,10 @@
 wi_zone <- read.csv("../data/WI_zone_wolfnumbers_07202022.csv")
-focused_zone <- c("1","2","3","4","5","6","x")
+focused_zone <- c("1","2","3","4","5","6")
 
 for(zone in focused_zone){
   temp <- wi_zone[wi_zone$Zone==zone, ]
   
-  logistic_fit <- nls(Wolves~p0*exp(r*(Year-1987))/(1+(p0*invK)*(exp(r*(Year-1987))-1)),
+  logistic_fit <- nls(Wolves~p0*exp(r*(Year-1980))/(1+(p0*invK)*(exp(r*(Year-1980))-1)),
                       data = temp, start = list(p0=1, invK=0.01, r = 0.1))
   
   logistic_predict <- predict(logistic_fit, newdata = temp, se = T)
@@ -21,7 +21,7 @@ for(zone in focused_zone){
   points(temp$Y[c(34:41)]
          ,temp$Wolves[c(34:41)]
          ,pch = 7)
-  abline(v = 1987+(-sum(log(logistic_fit$m$getPars()[c("p0","invK")])))/logistic_fit$m$getPars()[c("r")], lty = 2)
+  abline(v = 1980+(-sum(log(logistic_fit$m$getPars()[c("p0","invK")])))/logistic_fit$m$getPars()[c("r")], lty = 2)
   abline(h = .5/logistic_fit$m$getPars()["invK"], lty = 2)
   #legend("topleft",legend = c("observed:pre-hunting","observed:post-hunting",
                               
@@ -56,5 +56,10 @@ legend("topleft",legend = c(paste("zone",focused_zone2),
        )
 dev.off()
 
+
+## an overall range fit
+
+logistic_fit_range <- nls(Winter.Minimum.Count~p0*exp(r*(year-1980))/(1+(p0*invK)*(exp(r*(year-1980))-1)),
+                    data = wolf_range, start = list(p0=1000, invK=1e-5, r = 0.1))
 
 

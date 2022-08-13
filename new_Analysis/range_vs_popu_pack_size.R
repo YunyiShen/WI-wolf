@@ -1,5 +1,5 @@
 ## see if we really have expansion dominated growth 
-area_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Range=wolf_range$Winter.Minimum.Count, area = "WI")
+area_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Range=wolf_range$Winter.Minimum.Count, area = "WI", Year = wolf$year)
 area_pop_lm <- lm(Population~Range-1, area_pop)
 area_pop_pred <- predict(area_pop_lm, se = T)
 
@@ -88,3 +88,26 @@ legend("bottomright", legend = c("WI","MI-UP"),pch = c(1,7))
 dev.off()
 
 wimi_area_pop_lm2 <- lm(Population~Range:area+Range, WI_MI_area_pop)
+
+## add MI to WI
+MI_data2 <- na.omit(MI_data)
+mi_wi_merge <- merge(area_pop, MI_data2)
+mi_wi_merge$Range <- mi_wi_merge$Range + mi_wi_merge$Area.occupied..km2.
+mi_wi_merge$Population <- mi_wi_merge$Population + mi_wi_merge$N
+mi_wi_merge <- mi_wi_merge[,c("Year","Range","Population")]
+
+png("./figs/Pop_vs_range_WI_MI_added.png", width = 6, height = 3.5, res = 500, unit = "in")
+
+par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
+
+plot(Population~Range, data = mi_wi_merge)
+wimi_area_pop_merge_lm <- lm(Population~Range-1, mi_wi_merge)
+wimi_area_pop_merge_lm_pred <- predict(wimi_area_pop_merge_lm, se = T)
+abline(wimi_area_pop_merge_lm)
+polygon(x = c(mi_wi_merge$Range[order(mi_wi_merge$Range)], rev(mi_wi_merge$Range[order(mi_wi_merge$Range)])),
+        y = c(wimi_area_pop_merge_lm_pred$fit[order(mi_wi_merge$Range)] - qt(0.975,wimi_area_pop_merge_lm_pred$df)*(wimi_area_pop_merge_lm_pred$se.fit[order(mi_wi_merge$Range)]), 
+              rev(wimi_area_pop_merge_lm_pred$fit[order(mi_wi_merge$Range)] + qt(0.975,wimi_area_pop_merge_lm_pred$df)*wimi_area_pop_merge_lm_pred$se.fit[order(mi_wi_merge$Range)])),
+        col =  adjustcolor("black", alpha.f = 0.10), border = NA)
+text(x = 2e4, y = 1200, # Coordinates
+     label = expression("Population = 0.0242 * Range\n p<2e-16, R^2=0.98"))
+dev.off()
