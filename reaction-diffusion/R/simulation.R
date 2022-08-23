@@ -54,7 +54,7 @@ range_time2 <- apply(core_land,3,function(w,Landscape){sum(w>1e-5)/sum(Landscape
 population2 <- apply(core_land,3,function(w,Landscape){sum(w)/sum(Landscape)},Landscape2)
 frontier2 <- 1:n #apply(core_land_frontier,3,function(w){sum(w>=0.1*max(max(w),1e-10))/sum(w>-10)})
 for(i in 1:n){
-  frontier2[i] <- sum(((core_land_growth[,,i]+core_land_growth[,,i])>=1e-5) * (core_land_growth[,,i]>=1e-5))/(sum(Landscape>1e-5))
+  frontier2[i] <- sum(((core_land_frontier[,,i]+core_land_growth[,,i])>=1e-5) * (core_land_growth[,,i]>=1e-5))/(sum(Landscape>1e-5))
 }
 
 png("Figs/softboundry.png",width = 8,height = 6, units = "in", res = 500)
