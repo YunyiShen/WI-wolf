@@ -147,7 +147,7 @@ exponential_mod <- fit_pois_mod(wolf$Winter.Minimum.Count[-c(34:41)]
 
 
 #pdf("./figs/population_overall.pdf", width = 6, height = 3.5)
-png("./figs/population_overall.png", width = 6, height = 3.5, res = 500, unit = "in")
+png("./figs/population_overall.png", width = 6, height = 3, res = 500, unit = "in")
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(wolf$year
      ,logistic_mod$pred, type = "l", ylab = "Population", xlab = 'Year', ylim = c(0,1300))
@@ -172,14 +172,14 @@ points(wolf$year[c(36:41)]-4
        ,pch = 7,col = "red"
 )
 
-lines(wolf$year
-      ,exponential_mod$pred
-      , lty = 2)
+#lines(wolf$year
+#      ,exponential_mod$pred
+#      , lty = 2)
 #points(wolf$year,wolf$Winter.Minimum.Count)
 legend("topleft",legend = c("observed:pre-hunting","observed:post-hunting",
                             "move 2015-2020 to 2011",
-                            "logistic","exponential"), 
-       lty = c(NA,NA,NA,1,2), pch = c(1,7,7,NA,NA), col = c("black","black","red","black","black"))
+                            "logistic"), 
+       lty = c(NA,NA,NA,1), pch = c(1,7,7,NA), col = c("black","black","red","black"))
 
 dev.off()
 
@@ -201,10 +201,10 @@ exponential_range <- fit_norm_mod(wolf_range$Winter.Minimum.Count[-c(34:41)]
                                   , wolf_range$year
                                   ,dd = F, se = F)
 
-png("./figs/range_overall.png", width = 6, height = 3.5, res = 500, unit = "in")
+png("./figs/range_overall.png", width = 6, height = 3, res = 500, unit = "in")
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(wolf_range$year
-     ,logistic_range$pred, type = "l", ylab = "Range", xlab = 'Year', ylim = c(0,1.3 * max(wolf_range$Winter.Minimum.Count)))
+     ,logistic_range$pred, type = "l", ylab = "Range", xlab = 'Year', ylim = c(0,500+ exp(-logistic_range$opt$par[3])))
 
 polygon(x = c(wolf$year, rev(wolf$year)),
         y = c(logistic_range$pred - qnorm(0.975)*logistic_range$se, 
@@ -223,15 +223,31 @@ points(wolf_range$year[c(36:41)]-4
        ,pch = 7
        ,col = "red"
 )
-lines(wolf_range$year
-      ,exponential_range$pred
-      ,lty = 2
+#lines(wolf_range$year
+#      ,exponential_range$pred
+#      ,lty = 2
      
-      )
+#      )
+abline(h = 46494, lty = 2)
+abline(h = 43119, lty = 2)
+abline(h = 40798, lty = 2)
+abline(h = exp(-logistic_range$opt$par[3]), lty = 3)
+polygon(x = c(1900,2030,2030,1099),
+        y = c(rep(1/ 2.132056e-05,2), 
+              rep(1/1.125668e-05, 2)),
+        col =  adjustcolor("black", alpha.f = 0.10), border = NA)
+
+
+text(2006,50000,"Stauffer et al. 2021")
+text(2006,43500,"Gantchoff et al. 2022")
+text(2006,38000,"Mladenoff et al. 2009")
+text(2018,exp(-logistic_range$opt$par[3])-500,"'K'")
+
+
 legend("topleft",legend = c("observed:pre-hunting","observed:post-hunting",
                             "move 2015-2020 to 2011",
-                            "logistic","exponential"), 
-       lty = c(NA,NA,NA,1,2), pch = c(1,7,7,NA,NA), col = c("black","black","red","black","black"))
+                            "logistic"), 
+       lty = c(NA,NA,NA,1), pch = c(1,7,7,NA), col = c("black","black","red","black"))
 
 dev.off()
 

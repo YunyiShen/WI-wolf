@@ -3,7 +3,7 @@ area_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Range=wolf_range$Win
 area_pop_lm <- lm(Population~Range-1, area_pop)
 area_pop_pred <- predict(area_pop_lm, se = T)
 
-png("./figs/Pop_vs_range.png", width = 6, height = 3.5, res = 500, unit = "in")
+png("./figs/Pop_vs_range.png", width = 6, height = 2.5, res = 500, unit = "in")
 
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(Population~Range,area_pop)
@@ -42,7 +42,7 @@ pack_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Pack=pack$Winter.Min
 pack_pop_lm <- lm(Population~Pack-1, pack_pop)
 pack_pop_pred <- predict(pack_pop_lm, se = T)
 
-png("./figs/Pop_vs_pack.png", width = 6, height = 3.5, res = 500, unit = "in")
+png("./figs/Pop_vs_pack.png", width = 6, height = 2.5, res = 500, unit = "in")
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(Population~Pack,pack_pop, xlab = "Pack count")
 abline(pack_pop_lm)
