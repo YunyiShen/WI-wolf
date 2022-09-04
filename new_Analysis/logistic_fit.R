@@ -172,6 +172,22 @@ points(wolf$year[c(36:41)]-4
        ,pch = 7,col = "red"
 )
 
+abline(h = 46494* 0.0254, lty = 2)
+abline(h = 43119* 0.0254, lty = 2)
+abline(h = 40798* 0.0254, lty = 2)
+abline(h = exp(-logistic_mod$opt$par[3]), lty = 3)
+polygon(x = c(1900,2030,2030,1099),
+        y = c(rep(1/exp(logistic_mod$opt$par[3]+1.96*sqrt((solve(logistic_mod$opt$hessian))[3,3])),2), 
+              rep(1/exp(logistic_mod$opt$par[3]-1.96*sqrt((solve(logistic_mod$opt$hessian))[3,3])), 2)),
+        col =  adjustcolor("black", alpha.f = 0.10), border = NA)
+
+
+text(2006,50000 * 0.0254,"Stauffer et al. 2021")
+text(2006,43500* 0.0254,"Gantchoff et al. 2022")
+text(2006,38000* 0.0254,"Mladenoff et al. 2009")
+text(2018,exp(-logistic_mod$opt$par[3])-30,"'K'")
+
+
 #lines(wolf$year
 #      ,exponential_mod$pred
 #      , lty = 2)

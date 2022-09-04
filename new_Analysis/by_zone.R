@@ -1,34 +1,41 @@
 wi_zone <- read.csv("../data/WI_zone_wolfnumbers_07202022.csv")
+habitat_zone <- read.csv("../data/ZoneSummaries_HabitatSuitability.csv")
 wi_zone$Pack.Area.in.Zone.m2 <- wi_zone$Pack.Area.in.Zone.m2 * (1e-6)
 focused_zone <- c("1","2","3","4","5","6")
 
 for(zone in focused_zone){
   temp <- wi_zone[wi_zone$Zone==zone, ]
+  habitat <- habitat_zone[habitat_zone$Geo==zone,c("Belant2022HabitatReclass_Area","Mladenoff09_HabitatProbability_Area")]
+  logistic_fit <- nls(Pack.Area.in.Zone.m2~p0*exp(r*(Year-1980))/(1+(p0*invK)*(exp(r*(Year-1980))-1)),
+                      data = temp, start = list(p0=100, invK=1e-5, r = 0.1))
   
-  #logistic_fit <- nls(Pack.Area.in.Zone.m2~p0*exp(r*(Year-1980))/(1+(p0*invK)*(exp(r*(Year-1980))-1)),
-  #                    data = temp, start = list(p0=100, invK=1e-5, r = 0.1))
-  
-  logistic_fit <- nls(Wolves~p0*exp(r*(Year-1980))/(1+(p0*invK)*(exp(r*(Year-1980))-1)),
-                      data = temp, start = list(p0=1, invK=0.01, r = 0.1))
+  #logistic_fit <- nls(Wolves~p0*exp(r*(Year-1980))/(1+(p0*invK)*(exp(r*(Year-1980))-1)),
+  #                    data = temp, start = list(p0=1, invK=0.01, r = 0.1))
                       
   
   logistic_predict <- predict(logistic_fit, newdata = temp, se = T)
   
-  png(paste0("./figs/population_zone_",zone,".png"), width = 4, height = 3, res = 500, unit = "in")
+  png(paste0("./figs/range_zone_",zone,".png"), width = 4, height = 3, res = 500, unit = "in")
   par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
   
   plot(temp$Y
-       ,logistic_predict, type = "l", ylab = "Population", xlab = 'Year', ylim = c(0,1.1 * max(1/logistic_fit$m$getPars()["invK"],max(temp$Wolves))))
+       ,logistic_predict, type = "l", ylab = "Range", xlab = 'Year', ylim = c(0,1.1 * max(1/logistic_fit$m$getPars()["invK"],max(temp$Pack.Area.in.Zone.m2),as.numeric(habitat))))
   
   points(temp$Y[-c(34:41)]
-         ,temp$Wolves[-c(34:41)]
+         ,temp$Pack.Area.in.Zone.m2[-c(34:41)]
   )
   points(temp$Y[c(34:41)]
-         ,temp$Wolves[c(34:41)]
+         ,temp$Pack.Area.in.Zone.m2[c(34:41)]
          ,pch = 7)
   abline(v = 1980+(-sum(log(logistic_fit$m$getPars()[c("p0","invK")])))/logistic_fit$m$getPars()[c("r")], lty = 2)
   abline(h = .5/logistic_fit$m$getPars()["invK"], lty = 2)
   abline(h = 1/logistic_fit$m$getPars()["invK"], lty = 3)
+  abline(h=habitat[1],lty = 3)
+  abline(h=habitat[2],lty = 3)
+  text(1990,habitat[1],"Gantchoff et al. 2022")
+  text(1990,habitat[2],"Mladenoff et al. 2009")
+  text(1980+(-sum(log(logistic_fit$m$getPars()[c("p0","invK")])))/logistic_fit$m$getPars()[c("r")],1/logistic_fit$m$getPars()["invK"],"'K'")
+  
   #legend("topleft",legend = c("observed:pre-hunting","observed:post-hunting",
                               
   #                            "logistic"), 
@@ -52,7 +59,7 @@ focused_zone2 <- c("1","2","3","4","5","6")
 for(zone in focused_zone2){
   temp <- wi_zone[wi_zone$Zone==zone, ]
   #png(paste0("./figs/population_zone_",zone,".png"), width = 4, height = 3, res = 500, unit = "in")
-  points(temp$Pack.Area.in.Zone.m2/1e6,temp$Wolves, pch = as.numeric(zone))
+  points(temp$Pack.Area.in.Zone.m2/1e6,temp$Pack.Area.in.Zone.m2, pch = as.numeric(zone))
   
 }
 
