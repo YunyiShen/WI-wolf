@@ -1,7 +1,11 @@
+source("interesting_time_points.R")
 wi_zone <- read.csv("../data/WI_zone_wolfnumbers_07202022.csv")
 habitat_zone <- read.csv("../data/ZoneSummaries_HabitatSuitability.csv")
 wi_zone$Pack.Area.in.Zone.m2 <- wi_zone$Pack.Area.in.Zone.m2 * (1e-6)
 focused_zone <- c("1","2","3","4","5","6")
+
+second_order_time <- c()
+third_order_time <- c()
 
 for(zone in focused_zone){
   temp <- wi_zone[wi_zone$Zone==zone, ]
@@ -14,6 +18,10 @@ for(zone in focused_zone){
                       
   
   logistic_predict <- predict(logistic_fit, newdata = temp, se = T)
+  p0 <- logistic_fit$m$getPars()["p0"]
+  invK <- logistic_fit$m$getPars()["invK"]
+  r <- logistic_fit$m$getPars()["r"]
+  
   
   png(paste0("./figs/range_zone_",zone,".png"), width = 4, height = 3, res = 500, unit = "in")
   par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
@@ -27,15 +35,19 @@ for(zone in focused_zone){
   points(temp$Y[c(34:41)]
          ,temp$Pack.Area.in.Zone.m2[c(34:41)]
          ,pch = 7)
-  abline(v = 1980+(-sum(log(logistic_fit$m$getPars()[c("p0","invK")])))/logistic_fit$m$getPars()[c("r")], lty = 2)
-  abline(h = .5/logistic_fit$m$getPars()["invK"], lty = 2)
+  abline(v = 1980+(-sum(log(logistic_fit$m$getPars()[c("p0","invK")])))/logistic_fit$m$getPars()[c("r")], lty = 2, col = "#ffaf0f")
+  second_order_time[zone] <- 1980+(-sum(log(logistic_fit$m$getPars()[c("p0","invK")])))/logistic_fit$m$getPars()[c("r")]
+  #abline(h = .5/logistic_fit$m$getPars()["invK"], lty = 2)
+  abline(v = (root_3rd_der(r,p0,invK))[1], lty = 2, col = "#55ff00")
+  abline(v = (root_3rd_der(r,p0,invK))[2], lty = 2, col = "#ff0000")
+  third_order_time[zone] <- max(root_3rd_der(r,p0,invK))
   abline(h = 1/logistic_fit$m$getPars()["invK"], lty = 3)
   abline(h=habitat[1],lty = 3)
   abline(h=habitat[2],lty = 3)
   text(1990,habitat[1],"Gantchoff et al. 2022")
   text(1990,habitat[2],"Mladenoff et al. 2009")
-  text(1980+(-sum(log(logistic_fit$m$getPars()[c("p0","invK")])))/logistic_fit$m$getPars()[c("r")],1/logistic_fit$m$getPars()["invK"],"'K'")
-  
+  #text(1980+(-sum(log(logistic_fit$m$getPars()[c("p0","invK")])))/logistic_fit$m$getPars()[c("r")],1/logistic_fit$m$getPars()["invK"],"'K'")
+  text(max(root_3rd_der(r,p0,invK)),1/logistic_fit$m$getPars()["invK"],"'K'" )
   #legend("topleft",legend = c("observed:pre-hunting","observed:post-hunting",
                               
   #                            "logistic"), 
@@ -75,4 +87,29 @@ dev.off()
 logistic_fit_range <- nls(Winter.Minimum.Count~p0*exp(r*(year-1980))/(1+(p0*invK)*(exp(r*(year-1980))-1)),
                     data = wolf_range[-c(34:41),], start = list(p0=1000, invK=1e-5, r = 0.1))
 
+second_order_time["WI"] <- 1980+(-sum(log(logistic_fit_range$m$getPars()[c("p0","invK")])))/logistic_fit_range$m$getPars()[c("r")]
+p0 <- logistic_fit_range$m$getPars()["p0"]
+invK <- logistic_fit_range$m$getPars()["invK"]
+r <- logistic_fit_range$m$getPars()["r"]
+third_order_time["WI"] <- max(root_3rd_der(r,p0,invK))
 
+second_order_time
+third_order_time
+times_interesting <- data.frame(zone = c(1:6,"WI"), second = second_order_time, third = third_order_time)
+write.csv(times_interesting,"./figs/interesting_time_for_range.csv", row.names = F)
+
+
+# draw the mortality risk fig
+mor_risk <- read.csv("../data/mortality_risk.csv")
+wlm_mor <- lm(Mean~Year, data = mor_risk, weights = (1/mor_risk$Standard.deviation)^2)
+
+
+ReLU <- function(x) x * (x>=0)
+png(paste0("./figs/mortality.png"), width = 4, height = 3, res = 500, unit = "in")
+par(mar = c(3,4,2,2), mgp = c(1.8, 0.5, 0))
+plot(mor_risk$Year, (mor_risk$Mean), xlab = "Year", ylab = "Mortality risk in wolf range \n (Stenglein et al. 2018)", pch = 15, ylim = c(-.0,max(mor_risk$Mean+mor_risk$Standard.deviation)))
+lines(mor_risk$Year, (mor_risk$Mean))
+arrows(x0=mor_risk$Year, y0=(mor_risk$Mean-mor_risk$Standard.deviation), x1=mor_risk$Year, y1=mor_risk$Mean+mor_risk$Standard.deviation, code=3, angle=90, length=0.05, col="black", lwd=1)
+abline(wlm_mor, lwd = 1.5)
+
+dev.off()
