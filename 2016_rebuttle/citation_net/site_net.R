@@ -64,12 +64,15 @@ edge_pepin <- data.frame(from = pepin$UT,to = "WOS:000397884000001", self_citati
 
 all_edges <- rbind(edge_treves,edge_stien,edge_olson,edge_pepin)
 
-g_treves <- make_igraph(edge_treves, authorship)
-g_stien <- make_igraph(edge_stien, authorship)
-g_olson <- make_igraph(edge_olson, authorship)
-g_pepin <- make_igraph(edge_pepin, authorship)
+#g_treves <- make_igraph(edge_treves, authorship)
+#g_stien <- make_igraph(edge_stien, authorship)
+#g_olson <- make_igraph(edge_olson, authorship)
+#g_pepin <- make_igraph(edge_pepin, authorship)
 
 g_combine <- make_igraph(all_edges, authorship)
+V(g_combine)$color <- c("orange","chartreuse")[(degree(g_combine) >= 2)+1]
+V(g_combine)$color[1:4] <- c("gray",rep("lightblue",3))
+V(g_combine)$color[67] <- "cyan1"
 
 #g_combine <- igraph::union(g_treves, g_stien)
 prot_star <- make_star(64, "in")
@@ -77,8 +80,12 @@ pro_coords <- layout_as_star(prot_star)
 in_the_center <- matrix(c(-.3,.3,.3,.3,-.3,-.3,.3,-.3), ncol = 2,byrow = T)
 coords <- rbind(in_the_center, pro_coords[-1,])
 
+
+
 par(mar = c(1,1,1,1), mgp = c(1.8, 0.5, 0), xpd = TRUE)
-plot(g_combine, layout = 2*coords, edge.arrow.size = 0.3, 
-     edge.width= 2,vertex.size=c(rep(40,4),rep(8,63)), 
+plot(g_combine, layout = 2*coords, edge.arrow.size = 0.15, 
+     edge.width= 1,vertex.size=c(rep(40,4),rep(8,63)), 
      vertex.label = c("Chapron\nand\nTreves\n2016", "Stien \n2017", "Olson et al. \n2017",  "Pepin et al. \n2017"  , 1:63),
-     vertex.color = c("gray",rep("lightblue",3),rep("orange",63)))
+     xlim = c(-1,1), ylim = c(-.8,.8)
+     )
+legend("topleft",legend = c("cites original","cites both","cites critic","self citation"),pt.bg = c("orange","chartreuse","cyan1",NA),col = c(NA,NA,NA,"red"),lty = c(0,0,0,1),pt.cex = 2,pch = c(22,22,22,NA), cex = 0.8)
