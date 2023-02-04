@@ -125,9 +125,11 @@ for(i in 1:n){
 
 
 png("Figs/patchy.png",width = 8,height = 6, units = "in", res = 500)
+namask <- ((patchy_land_growth[,,100]+patchy_land_frontier[,,100])>=1e-5) * (patchy_land_growth[,,100]>=1e-5)
+namask <- namask >= -Inf
 par(mfrow = c(3,3),mar = c(2,2,2,2)+.3, mgp = c(1.3, 0.5, 0))
-image(patchy_land[,,100],main = "t=100")
-image(patchy_land[,,300],main = "t=300")
+image(patchy_land[,,100] * namask,main = "t=100")
+image(patchy_land[,,300] * namask,main = "t=300")
 plot(range_time3, main = "relative range/population", type = "l", xlab = "t", ylab = "relative range and population")
 lines(population3, lty = 2)
 abline(v = 100, lty = 3)
@@ -140,8 +142,8 @@ image(((patchy_land_growth[,,300]+patchy_land_frontier[,,300])>=1e-5) * (patchy_
 plot(frontier3,type = "l", xlab = "time", ylab = "relative range in frontier")
 
 
-image(patchy_land[,,500],main = "t=500")
-image(patchy_land[,,1000],main = "t=1000")
+image(patchy_land[,,500] * namask ,main = "t=500")
+image(patchy_land[,,1000]* namask,main = "t=1000")
 plot(range_time3,population3,xlab = "relative range", ylab = "relative population")
 dev.off()
 

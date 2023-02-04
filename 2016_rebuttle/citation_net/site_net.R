@@ -22,11 +22,12 @@ get_citation <- function(string_vec){
 }
 
 is_self_citation <- function(from, to = "Chapron, G; Treves, A"){
-  author_list_to <- stringr::str_split(to,";")[[1]]
-  author_list_from <- stringr::str_split(from,";") |>
+  author_list_to <- stringr::str_split(to,"; ")[[1]]
+  author_list_from <- stringr::str_split(from,"; ") |>
     sapply(FUN = function(w, author_list_to){
       length(intersect(w, author_list_to ))>0
     }, author_list_to)
+  author_list_from
 }
 
 make_igraph <- function(all_edges, authorship){
@@ -81,7 +82,7 @@ in_the_center <- matrix(c(-.3,.3,.3,.3,-.3,-.3,.3,-.3), ncol = 2,byrow = T)
 coords <- rbind(in_the_center, pro_coords[-1,])
 
 
-
+png("cite_net.png", width = 8, height = 5, res = 500, unit = "in")
 par(mar = c(1,1,1,1), mgp = c(1.8, 0.5, 0), xpd = TRUE)
 plot(g_combine, layout = 2*coords, edge.arrow.size = 0.15, 
      edge.width= 1,vertex.size=c(rep(40,4),rep(8,63)), 
@@ -89,3 +90,36 @@ plot(g_combine, layout = 2*coords, edge.arrow.size = 0.15,
      xlim = c(-1,1), ylim = c(-.8,.8)
      )
 legend("topleft",legend = c("cites original","cites both","cites critic","self citation"),pt.bg = c("orange","chartreuse","cyan1",NA),col = c(NA,NA,NA,"red"),lty = c(0,0,0,1),pt.cex = 2,pch = c(22,22,22,NA), cex = 0.8)
+dev.off()
+
+# alt score rank
+trevers_alt <- read.table("./savedrecs_alt.txt", header = T,sep = "\t", quote = "") 
+rownames(trevers_alt) <- trevers_alt$UT
+trevers_alt <- trevers_alt[order_papers,]
+#paper_ids <- c("Chapron & Treves 2016", "Stien 2017", "Olson et al. 2017",  "Pepin et al. 2017"  , 1:63)
+paper_ids <- c("C&T2016", "S2017", "O et al. 2017",  "P et al. 2017"  , 1:63)
+trevers_alt$id <- paper_ids
+alt_order <- rev(order(trevers_alt$Altmetric))
+trevers_alt$id <- factor(trevers_alt$id, levels = paper_ids[alt_order])
+trevers_alt <- trevers_alt[!is.na(trevers_alt$Altmetric), ]
+trevers_alt$AU <- sub('"',"",sub('"',"",trevers_alt$AU))
+colors <- c("gray","black","red")
+names(colors) <- c("original","No","Yes")
+self_cite <- is_self_citation(trevers_alt$AU) + 2
+trevers_alt$self_cite <- c("original","No","Yes")[c(1,self_cite[-1])]
+trevers_alt$self_cite <- factor(trevers_alt$self_cite, levels = c("original","No","Yes"))
+library(ggplot2)
+ggplot(trevers_alt, aes(x = id, y = Altmetric)) + 
+  geom_bar(stat="identity",aes(fill = self_cite)) + 
+  theme_classic() + 
+  theme(axis.text.x = element_text(angle = -65, vjust = 0.5, hjust=0)) + 
+  xlab("") + 
+  labs(fill = "Self citation") +
+  scale_fill_manual(values = colors) + 
+  theme(legend.position = c(0.9, 0.7))
+
+  
+# 
+ggsave("altmetric.png", width = 10, height = 6, unit = "in", dpi = 500, scale = 0.8)
+
+

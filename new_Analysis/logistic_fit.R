@@ -172,6 +172,10 @@ points(wolf$year[c(36:41)]-4
        ,pch = 7,col = "red"
 )
 
+text(x = wolf$year[34:35], 
+     y = wolf$Winter.Minimum.Count[c(34:35)], labels = c("*","*"), 
+     pos = 1, offset = 0.3)
+
 abline(h = 46494* 0.0254, lty = 2)
 abline(h = 43119* 0.0254, lty = 2)
 abline(h = 40798* 0.0254, lty = 2)
@@ -193,7 +197,7 @@ text(2018,exp(-logistic_mod$opt$par[3])-30,"'K'")
 #      , lty = 2)
 #points(wolf$year,wolf$Winter.Minimum.Count)
 legend("topleft",legend = c("observed:pre-hunting","observed:post-hunting",
-                            "move 2015-2020 to 2011",
+                            "shift 2015-2020 to 2011",
                             "logistic"), 
        lty = c(NA,NA,NA,1), pch = c(1,7,7,NA), col = c("black","black","red","black"))
 
@@ -239,6 +243,11 @@ points(wolf_range$year[c(36:41)]-4
        ,pch = 7
        ,col = "red"
 )
+
+text(x = wolf_range$year[34:35], 
+     y = wolf_range$Winter.Minimum.Count[c(34:35)], labels = c("*","*"), 
+     pos = 1, offset = 0.3)
+
 #lines(wolf_range$year
 #      ,exponential_range$pred
 #      ,lty = 2
@@ -261,7 +270,7 @@ text(2018,exp(-logistic_range$opt$par[3])-500,"'K'")
 
 
 legend("topleft",legend = c("observed:pre-hunting","observed:post-hunting",
-                            "move 2015-2020 to 2011",
+                            "shift 2015-2020 to 2011",
                             "logistic"), 
        lty = c(NA,NA,NA,1), pch = c(1,7,7,NA), col = c("black","black","red","black"))
 

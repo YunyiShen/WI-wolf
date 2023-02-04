@@ -14,6 +14,10 @@ polygon(x = c(area_pop$Range, rev(area_pop$Range)),
         col =  adjustcolor("black", alpha.f = 0.10), border = NA)
 text(x = 1e4, y = 800, # Coordinates
      label = expression("Population = 0.0254 * Range\n p<2e-16, R^2=0.99"))
+points(Population~Range,area_pop[area_pop$Year>=2015,], pch = 7)
+legend("bottomright",legend = c("pre-hunting","post-hunting"), 
+       pch = c(1,7))
+
 dev.off()
 
 ## direct test for stationary of the last two decades
@@ -34,6 +38,7 @@ polygon(x = c(last_decade$year+2010, rev(last_decade$year+2010)),
         col =  adjustcolor("black", alpha.f = 0.10), border = NA)
 text(x = 2014, y = 0.0285, # Coordinates
      label = expression("Density = 0.0259-9.7e-5 * (Year-2010)\n p=0.13, R^2=0.067"))
+
 dev.off()
 
 ## pack size 
@@ -52,6 +57,11 @@ polygon(x = c(pack_pop$Pack, rev(pack_pop$Pack)),
         col =  adjustcolor("black", alpha.f = 0.10), border = NA)
 text(x = 70, y = 800, # Coordinates
      label = expression("Population = 3.78 * Pack\n p<2e-16, R^2=0.99"))
+
+points(Population~Pack,pack_pop[area_pop$Year>=2015,], pch = 7)
+legend("bottomright",legend = c("pre-hunting","post-hunting"), 
+       pch = c(1,7))
+
 dev.off()
 
 
