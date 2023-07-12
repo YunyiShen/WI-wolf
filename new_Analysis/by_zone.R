@@ -23,7 +23,7 @@ for(zone in focused_zone){
   r <- logistic_fit$m$getPars()["r"]
   
   
-  png(paste0("./figs/range_zone_",zone,".png"), width = 4, height = 3, res = 500, unit = "in")
+  pdf(paste0("./figs/range_zone_",zone,".pdf"), width = 4, height = 3)
   par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
   
   plot(temp$Y
@@ -60,7 +60,7 @@ area_pop_lm <- lm(Population~Range-1, area_pop)
 area_pop_pred <- predict(area_pop_lm, se = T)
 
 
-png("./figs/pop_vs_range_by_zone_all.png", width = 6, height = 3.5, res = 500, unit = "in")
+pdf("./figs/pop_vs_range_by_zone_all.pdf", width = 6, height = 3.5)
 
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 
@@ -71,13 +71,14 @@ focused_zone2 <- c("1","2","3","4","5","6")
 for(zone in focused_zone2){
   temp <- wi_zone[wi_zone$Zone==zone, ]
   #png(paste0("./figs/population_zone_",zone,".png"), width = 4, height = 3, res = 500, unit = "in")
-  points(temp$Pack.Area.in.Zone.m2/1e6,temp$Pack.Area.in.Zone.m2, pch = as.numeric(zone))
+  points(temp$Pack.Area.in.Zone.m2,temp$Wolves, pch = as.numeric(zone))
   
 }
 
 legend("topleft",legend = c(paste("zone",focused_zone2),
                             "overall fit"), 
        lty = c(rep(NA,length(focused_zone2)),1), pch = c(as.numeric(focused_zone2),NA),
+       bg = "white"
        )
 dev.off()
 

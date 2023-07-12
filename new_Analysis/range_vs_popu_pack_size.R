@@ -3,7 +3,7 @@ area_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Range=wolf_range$Win
 area_pop_lm <- lm(Population~Range-1, area_pop)
 area_pop_pred <- predict(area_pop_lm, se = T)
 
-png("./figs/Pop_vs_range.png", width = 6, height = 2.5, res = 500, unit = "in")
+pdf("./figs/Pop_vs_range.pdf", width = 6, height = 2.5)
 
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(Population~Range,area_pop)
@@ -16,7 +16,7 @@ text(x = 1e4, y = 800, # Coordinates
      label = expression("Population = 0.0254 * Range\n p<2e-16, R^2=0.99"))
 points(Population~Range,area_pop[area_pop$Year>=2015,], pch = 7)
 legend("bottomright",legend = c("pre-hunting","post-hunting"), 
-       pch = c(1,7))
+       pch = c(1,7), bg = "white")
 
 dev.off()
 
@@ -28,7 +28,7 @@ lmtrend <- lm(density~year,last_decade) # 2012-14 is legal harvest
 tseries::kpss.test(last_decade$density) # kpss test for stationary, seems stationary
 lm_time <- lm(density~year, last_decade)
 pred_lm <- predict(lm_time,se = T)
-png("./figs/den_last20.png", width = 6, height = 3.5, res = 500, unit = "in")
+pdf("./figs/den_last20.png", width = 6, height = 3.5)
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(2000:2020, last_decade$density, xlab = "Year", ylab = "Density")
 lines(2000:2020,pred_lm$fit)
@@ -47,7 +47,7 @@ pack_pop<- data.frame(Population=wolf$Winter.Minimum.Count, Pack=pack$Winter.Min
 pack_pop_lm <- lm(Population~Pack-1, pack_pop)
 pack_pop_pred <- predict(pack_pop_lm, se = T)
 
-png("./figs/Pop_vs_pack.png", width = 6, height = 2.5, res = 500, unit = "in")
+pdf("./figs/Pop_vs_pack.pdf", width = 6, height = 2.5)
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(Population~Pack,pack_pop, xlab = "Pack count")
 abline(pack_pop_lm)
@@ -60,7 +60,7 @@ text(x = 70, y = 800, # Coordinates
 
 points(Population~Pack,pack_pop[area_pop$Year>=2015,], pch = 7)
 legend("bottomright",legend = c("pre-hunting","post-hunting"), 
-       pch = c(1,7))
+       pch = c(1,7), bg = "white")
 
 dev.off()
 
@@ -74,7 +74,7 @@ summary(MI_lm)
 
 ## combine dataset
 
-MI_area_pop <- data.frame(Population = MI_data$N, Range = MI_data$Area.occupied..km2., area = "MI")
+MI_area_pop <- data.frame(Population = MI_data$N, Range = MI_data$Area.occupied..km2., area = "MI", Year = MI_data$Year)
 WI_MI_area_pop <- rbind(area_pop, MI_area_pop) |> na.omit()
 
 WI_MI_area_pop <- WI_MI_area_pop[order(WI_MI_area_pop$Range),]
@@ -82,7 +82,7 @@ WI_MI_area_pop <- WI_MI_area_pop[order(WI_MI_area_pop$Range),]
 wimi_area_pop_lm <- lm(Population~Range-1, WI_MI_area_pop)
 wimi_area_pop_pred <- predict(wimi_area_pop_lm, se = T)
 
-png("./figs/Pop_vs_range_WI_MI.png", width = 6, height = 3.5, res = 500, unit = "in")
+pdf("./figs/Pop_vs_range_WI_MI.pdf", width = 6, height = 3)
 
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(Population~Range,WI_MI_area_pop)
@@ -94,7 +94,7 @@ polygon(x = c(WI_MI_area_pop$Range, rev(WI_MI_area_pop$Range)),
         col =  adjustcolor("black", alpha.f = 0.10), border = NA)
 text(x = 1e4, y = 800, # Coordinates
      label = expression("Population = 0.0243 * Range\n p<2e-16, R^2=0.98"))
-legend("bottomright", legend = c("WI","MI-UP"),pch = c(1,7))
+legend("bottomright", legend = c("WI","MI-UP"),pch = c(1,7), bg = "white")
 dev.off()
 
 wimi_area_pop_lm2 <- lm(Population~Range:area+Range, WI_MI_area_pop)
@@ -106,7 +106,7 @@ mi_wi_merge$Range <- mi_wi_merge$Range + mi_wi_merge$Area.occupied..km2.
 mi_wi_merge$Population <- mi_wi_merge$Population + mi_wi_merge$N
 mi_wi_merge <- mi_wi_merge[,c("Year","Range","Population")]
 
-png("./figs/Pop_vs_range_WI_MI_added.png", width = 6, height = 3.5, res = 500, unit = "in")
+pdf("./figs/Pop_vs_range_WI_MI_added.pdf", width = 6, height = 3)
 
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 

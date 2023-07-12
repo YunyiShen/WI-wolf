@@ -1,5 +1,7 @@
 #include <RcppArmadillo.h>
 #include <math.h>
+#include <iostream>
+using namespace std;
 // [[Rcpp::depends(RcppArmadillo)]]
 
 double subm_index(const arma::mat& X,int M, int x,int N, int y,int x0,int y0)
@@ -44,25 +46,38 @@ arma::cube update_density(const arma::mat & X,
 Rcpp::List simulate_reaction_diffusion(const arma::mat& X_init, 
                               const arma::mat& Landscape, 
                               double r, 
-                              int n){
+                              int n, int thin = 1){
   int M = X_init.n_rows;
   int N = X_init.n_cols;
-  arma::cube res(M,N,n+1);
-  arma::cube frontier(M,N,n+1, arma::fill::zeros);
-  arma::cube growth(M,N,n+1, arma::fill::zeros);
+  arma::cube res(M,N,floor(n/thin)+1);
+  arma::cube frontier(M,N,floor(n/thin)+1, arma::fill::zeros);
+  arma::cube growth(M,N,floor(n/thin)+1, arma::fill::zeros);
+  arma::vec time(floor(n/thin)+1, arma::fill::zeros);
   arma::cube tmp;
+  arma::mat tmpm1 = X_init;
+  //cout << floor(n/thin)+1 << endl;
   //arma::mat L = {{0.25,.5,0.25},{.5,-3,.5},{0.25,.5,0.25}}; // discrete Laplace operator
   arma::mat L = {{0,1,0.},{1,-4,1},{0,1,0}}; // discrete Laplace operator
   
   res.slice(0) = X_init;
+  int counter = 0;
   for(int i = 1; i <= n; i++){
-    tmp= update_density(res.slice(i-1),L,Landscape, r);
-    res.slice(i) = tmp.slice(0);
-    frontier.slice(i) = tmp.slice(1);
-    growth.slice(i) = tmp.slice(2);
+    tmp= update_density(tmpm1,L,Landscape, r);
+    tmpm1 = tmp.slice(0);
+    if(i % thin == 0){
+      //cout << i << endl;
+      //cout << counter << endl;
+      counter ++ ;
+      time[counter] = i;
+      res.slice(counter) = tmp.slice(0);
+      frontier.slice(counter) = tmp.slice(1);
+      growth.slice(counter) = tmp.slice(2);
+    }
+    
   }
   Rcpp::List result;
-  result["density"]=res;
+  result["time"] = time;
+  result["density"] = res;
   result["frontier"] = frontier;
   result["growth"] = growth;
   return result;

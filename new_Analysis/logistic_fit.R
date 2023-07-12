@@ -147,7 +147,7 @@ exponential_mod <- fit_pois_mod(wolf$Winter.Minimum.Count[-c(34:41)]
 
 
 #pdf("./figs/population_overall.pdf", width = 6, height = 3.5)
-png("./figs/population_overall.png", width = 6, height = 3, res = 500, unit = "in")
+pdf("./figs/population_overall.pdf", width = 6, height = 2.5)
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(wolf$year
      ,logistic_mod$pred, type = "l", ylab = "Population", xlab = 'Year', ylim = c(0,1300))
@@ -199,7 +199,8 @@ text(2018,exp(-logistic_mod$opt$par[3])-30,"'K'")
 legend("topleft",legend = c("observed:pre-hunting","observed:post-hunting",
                             "shift 2015-2020 to 2011",
                             "logistic"), 
-       lty = c(NA,NA,NA,1), pch = c(1,7,7,NA), col = c("black","black","red","black"))
+       lty = c(NA,NA,NA,1), pch = c(1,7,7,NA), col = c("black","black","red","black"),
+       bg = "white")
 
 dev.off()
 
@@ -221,7 +222,7 @@ exponential_range <- fit_norm_mod(wolf_range$Winter.Minimum.Count[-c(34:41)]
                                   , wolf_range$year
                                   ,dd = F, se = F)
 
-png("./figs/range_overall.png", width = 6, height = 3, res = 500, unit = "in")
+pdf("./figs/range_overall.pdf", width = 6, height = 2.5)
 par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
 plot(wolf_range$year
      ,logistic_range$pred, type = "l", ylab = "Range", xlab = 'Year', ylim = c(0,500+ exp(-logistic_range$opt$par[3])))
@@ -272,7 +273,8 @@ text(2018,exp(-logistic_range$opt$par[3])-500,"'K'")
 legend("topleft",legend = c("observed:pre-hunting","observed:post-hunting",
                             "shift 2015-2020 to 2011",
                             "logistic"), 
-       lty = c(NA,NA,NA,1), pch = c(1,7,7,NA), col = c("black","black","red","black"))
+       lty = c(NA,NA,NA,1), pch = c(1,7,7,NA), col = c("black","black","red","black"), 
+       bg = "white")
 
 dev.off()
 
@@ -324,86 +326,5 @@ CI_K$low = c(1/exp(logistic_mod$opt$par[3]+1.64*sqrt((solve(logistic_mod$opt$hes
 CI_K$high <- c(1/exp(logistic_mod$opt$par[3]-1.64*sqrt((solve(logistic_mod$opt$hessian))[3,3])),
                mean(last_decade$density)/exp(logistic_range$opt$par[3]-1.64*sqrt((solve(logistic_range$opt$hessian))[3,3])),
                2405)
-
-png("./figs/K_estimates.png", width = 4.5, height = 3, res = 500, unit = "in")
-par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
-
-plot(1:3, CI_K$K, pch = 15,xaxt = "n", xlim = c(0.5,3.5), 
-     ylim = c(500, 2600),
-     xlab = "Method",
-     ylab = "Estimated carrying capacity")
-axis(1, at = 1:3,
-     labels = CI_K$method) 
-arrows(1:3, CI_K$low, 1:3, CI_K$high, length=0.05, angle=90, code=3)
-dev.off()
-
-## now we take a look at when the range expansion start to speed up, project to 2030:
-logistic_range2 <- fit_norm_mod(wolf_range$Winter.Minimum.Count[-c(34:41)]
-                               , wolf_range$year[-c(34:41)]
-                               , 1980:2030
-)
-
-logistic_mod2 <- fit_pois_mod(wolf$Winter.Minimum.Count[-c(34:41)]
-                             , wolf$year[-c(34:41)]
-                             , 1980:2030
-)
-
-
-
-t_speed_up_range <- root_3rd_der(exp(logistic_range2$opt$par[1]), 
-             exp(logistic_range2$opt$par[2]), 
-             exp(logistic_range2$opt$par[3]))
-
-t_speed_up_pop <- root_3rd_der(exp(logistic_mod2$opt$par[1]), 
-                                 exp(logistic_mod2$opt$par[2]), 
-                                 exp(logistic_mod2$opt$par[3]))
-
-png("./figs/speed_up_slow_down.png", width = 6, height = 6, res = 500, unit = "in")
-
-
-par(mfrow = c(3,1))
-par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
-plot(1980:2030
-     ,logistic_range2$pred, type = "l", ylab = "Range", xlab = 'Year', ylim = c(0,1.5 * max(wolf_range$Winter.Minimum.Count)))
-points(wolf_range$year[-c(34:41)]
-       ,wolf_range$Winter.Minimum.Count[-c(34:41)]
-)
-abline(v = t_speed_up_range, lty = 2, col = "red")
-#abline(v = t_speed_up_pop, lty = 2, col = "blue")
-
-legend("bottomright",legend = c("observed",
-                            "logistic",
-                            "ac/de-celerite"), 
-       lty = c(NA,1,2), pch = c(1,NA,NA), col = c("black","black","red"))
-
-
-plot(1980:2030
-     ,logistic_mod2$pred, type = "l", ylab = "Population", xlab = 'Year', ylim = c(0,1300))
-
-points(wolf$year[-c(34:41)]
-       ,wolf$Winter.Minimum.Count[-c(34:41)]
-)
-
-#abline(v = t_speed_up_range, lty = 2, col = "red")
-abline(v = t_speed_up_pop, lty = 2, col = "blue")
-legend("bottomright",legend = c("observed",
-                                "logistic",
-                                "ac/de-celerite"), 
-       lty = c(NA,1,2), pch = c(1,NA,NA), col = c("black","black","blue"))
-
-
-plot(1980:2030, c(wolf_den$Winter.Minimum.Count, rep(NA, 51-41)), xlab = "Year", ylab = "Local density")
-abline(v = t_speed_up_range, lty = 2, col = "red")
-abline(v = t_speed_up_pop, lty = 2, col = "blue")
-
-legend("bottomright",legend = c("observed",
-                                "logistic",
-                                "ac/de-celerite",
-                                "range",
-                                "population"
-                                ), 
-       lty = c(NA,1,NA,2,2), pch = c(1,NA,NA,NA,NA), col = c("black","black",NA,"red","blue"))
-dev.off()
-
 
 
