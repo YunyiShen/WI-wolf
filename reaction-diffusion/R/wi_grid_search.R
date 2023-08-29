@@ -154,6 +154,9 @@ legend("topleft",legend = c("observed",
 
 image(wi_land_res$density[,,9],main = "c) relative density 2000", adj = 0)
 image(wi_land_res$density[,,20],main = "d) relative density 2010", adj = 0)
+
+
+
 image(wi_land_res$density[,,28],main = "e) relative density 2020", adj = 0)
 image(wi_land_res$density[,,37],main = "f) relative density 2030", adj = 0)
 dev.off()

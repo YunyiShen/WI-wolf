@@ -24,8 +24,9 @@ for(i in 1:n){
   frontier[i] <- sum(((allee_land_growth[,,i]+allee_land_frontier[,,i])>=1e-5) * (allee_land_growth[,,i]>=1e-5))/(sum(allee_landscape>1e-5))
 }
 
-pdf("Figs/allee.pdf",width = 8,height = 6)
-par(mfrow = c(3,3),mar = c(2,2,2,2)+.3, mgp = c(1.3, 0.5, 0))
+pdf("Figs/allee-short.pdf",width = 8,height = 4)
+#pdf("Figs/allee-short.pdf",width = 8,height = 6)
+par(mfrow = c(2,3),mar = c(2,2,2,2)+.3, mgp = c(1.3, 0.5, 0))
 image(allee_land[,,1],main = "a) density t=1", adj = 0)
 image(allee_land[,,100],main = "b) density t=100", adj = 0)
 plot(range_time, type = "l", xlab = "time", ylab = "relative range and population", 
@@ -41,12 +42,12 @@ plot(range_time,population,
 
 
 
-image(((allee_land_growth[,,200]+allee_land_frontier[,,200])>=1e-5) * (allee_land_growth[,,200]>=1e-5),
-      main = "g) frontier t=200", adj = 0)
-image(((allee_land_growth[,,300]+allee_land_frontier[,,300])>=1e-5) * (allee_land_growth[,,300]>=1e-5),
-      main = "h) frontier t=300", adj = 0)
-plot(frontier, type = "l", xlab = "time", ylab = "relative range in frontier", 
-     main = "i) range in frontier", adj = 0)
+#image(((allee_land_growth[,,200]+allee_land_frontier[,,200])>=1e-5) * (allee_land_growth[,,200]>=1e-5),
+#      main = "g) frontier t=200", adj = 0)
+#image(((allee_land_growth[,,300]+allee_land_frontier[,,300])>=1e-5) * (allee_land_growth[,,300]>=1e-5),
+#      main = "h) frontier t=300", adj = 0)
+#plot(frontier, type = "l", xlab = "time", ylab = "relative range in frontier", 
+#     main = "i) range in frontier", adj = 0)
 
 
 dev.off()

@@ -21,8 +21,10 @@ for(i in 1:n){
   frontier[i] <- sum(((uniform_land_growth[,,i]+uniform_land_frontier[,,i])>=1e-5) * (uniform_land_growth[,,i]>=1e-5))/(sum(Landscape>1e-5))
 }
 
-pdf("Figs/hardboundry.pdf",width = 8,height = 6)
-par(mfrow = c(3,3),mar = c(2,2,2,2)+.3, mgp = c(1.3, 0.5, 0))
+
+pdf("Figs/hardboundry-short.pdf",width = 8,height = 4)
+#pdf("Figs/hardboundry.pdf",width = 8,height = 6)
+par(mfrow = c(2,3),mar = c(2,2,2,2)+.3, mgp = c(1.3, 0.5, 0))
 image(uniform_land[,,1],main = "a) density t=1", adj = 0)
 image(uniform_land[,,100],main = "b) density t=100", adj = 0)
 plot(range_time, type = "l", xlab = "time", ylab = "relative range and population", 
@@ -38,12 +40,12 @@ plot(range_time,population,
 
 
 
-image(((uniform_land_growth[,,200]+uniform_land_frontier[,,200])>=1e-5) * (uniform_land_growth[,,200]>=1e-5),
-      main = "g) frontier t=200", adj = 0)
-image(((uniform_land_growth[,,300]+uniform_land_frontier[,,300])>=1e-5) * (uniform_land_growth[,,300]>=1e-5),
-      main = "h) frontier t=300", adj = 0)
-plot(frontier, type = "l", xlab = "time", ylab = "relative range in frontier", 
-     main = "i) range in frontier", adj = 0)
+#image(((uniform_land_growth[,,200]+uniform_land_frontier[,,200])>=1e-5) * (uniform_land_growth[,,200]>=1e-5),
+#      main = "g) frontier t=200", adj = 0)
+#image(((uniform_land_growth[,,300]+uniform_land_frontier[,,300])>=1e-5) * (uniform_land_growth[,,300]>=1e-5),
+#      main = "h) frontier t=300", adj = 0)
+#plot(frontier, type = "l", xlab = "time", ylab = "relative range in frontier", 
+#     main = "i) range in frontier", adj = 0)
 
 
 dev.off()
@@ -66,8 +68,10 @@ for(i in 1:n){
   frontier2[i] <- sum(((core_land_frontier[,,i]+core_land_growth[,,i])>=1e-5) * (core_land_growth[,,i]>=1e-5))/(sum(Landscape>1e-5))
 }
 
-pdf("Figs/softboundry.pdf",width = 8,height = 6)
-par(mfrow = c(3,3),mar = c(2,2,2,2)+.3, mgp = c(1.3, 0.5, 0))
+pdf("Figs/softboundry-short.pdf",width = 8,height = 4)
+
+#pdf("Figs/softboundry.pdf",width = 8,height = 6)
+par(mfrow = c(2,3),mar = c(2,2,2,2)+.3, mgp = c(1.3, 0.5, 0))
 image(core_land[,,1], main = "a) t=1", adj = 0)
 image(core_land[,,100], main = "b) t=100", adj = 0)
 plot(range_time2, main = "c) relative range/population", 
@@ -87,13 +91,12 @@ image(core_land[,,350],main = "e) t=350", adj = 0)
 plot(range_time2,population2,xlab = "relative range", 
      ylab = "relative population", main = "f) population-range curve", adj = 0)
 
-image(((core_land_growth[,,225]+core_land_frontier[,,225])>=1e-5) * (core_land_growth[,,225]>=1e-5),
-      main = "g) frontier t=225", adj = 0)
-image(((core_land_growth[,,350]+core_land_frontier[,,350])>=1e-5) * (core_land_growth[,,350]>=1e-5),
-      main = "h) frontier t=350", adj = 0)
-plot(frontier2, type = "l", xlab = "time", ylab = "relative range in frontier", 
-     main = "i) range in frontier", adj = 0)
-
+#image(((core_land_growth[,,225]+core_land_frontier[,,225])>=1e-5) * (core_land_growth[,,225]>=1e-5),
+#      main = "g) frontier t=225", adj = 0)
+#image(((core_land_growth[,,350]+core_land_frontier[,,350])>=1e-5) * (core_land_growth[,,350]>=1e-5),
+#      main = "h) frontier t=350", adj = 0)
+#plot(frontier2, type = "l", xlab = "time", ylab = "relative range in frontier", 
+#     main = "i) range in frontier", adj = 0)
 
 dev.off()
 
@@ -144,11 +147,12 @@ for(i in 1:n){
   frontier3[i] <- sum(((patchy_land_frontier[,,i]+patchy_land_growth[,,i])>=1e-5) * (patchy_land_growth[,,i]>=1e-5),na.rm = T)/(sum(Landscape3>1e-5,na.rm=T))
 }
 
+pdf("Figs/patchy42-short.pdf",width = 8,height = 4)
 
-pdf("Figs/patchy42.pdf",width = 8,height = 6)
+#pdf("Figs/patchy42.pdf",width = 8,height = 6)
 namask <- ((patchy_land_growth[,,100]+patchy_land_frontier[,,100])>=1e-5) * (patchy_land_growth[,,100]>=1e-5)
 namask <- namask >= -Inf
-par(mfrow = c(3,3),mar = c(2,2,2,2)+.3, mgp = c(1.3, 0.5, 0))
+par(mfrow = c(2,3),mar = c(2,2,2,2)+.3, mgp = c(1.3, 0.5, 0))
 image(patchy_land[,,100] * namask,main = "a) t=100", adj = 0)
 image(patchy_land[,,300] * namask,main = "b) t=300", adj = 0)
 plot(range_time3, main = "c) relative range/population", 
@@ -167,12 +171,12 @@ image(patchy_land[,,1000]* namask,main = "e) t=1000", adj = 0)
 plot(range_time3,population3,xlab = "relative range", 
      ylab = "relative population", main = "f) population-range curve", adj = 0)
 
-image(((patchy_land_growth[,,100]+patchy_land_frontier[,,100])>=1e-5) * (patchy_land_growth[,,100]>=1e-5),
-      main = "g) frontier t=100", adj = 0)
-image(((patchy_land_growth[,,300]+patchy_land_frontier[,,300])>=1e-5) * (patchy_land_growth[,,300]>=1e-5),
-      main = "h) frontier t=300", adj = 0)
-plot(frontier3,type = "l", xlab = "time", 
-     ylab = "relative range in frontier", 
-     main = "i) range in frontier", adj = 0)
+#image(((patchy_land_growth[,,100]+patchy_land_frontier[,,100])>=1e-5) * (patchy_land_growth[,,100]>=1e-5),
+#      main = "g) frontier t=100", adj = 0)
+#image(((patchy_land_growth[,,300]+patchy_land_frontier[,,300])>=1e-5) * (patchy_land_growth[,,300]>=1e-5),
+#      main = "h) frontier t=300", adj = 0)
+#plot(frontier3,type = "l", xlab = "time", 
+#     ylab = "relative range in frontier", 
+#     main = "i) range in frontier", adj = 0)
 dev.off()
 

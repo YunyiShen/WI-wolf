@@ -65,6 +65,29 @@ legend("bottomright",legend = c("pre-hunting","post-hunting"),
 dev.off()
 
 
+### area pack ###
+pack_range<- data.frame(Range=wolf_range$Winter.Minimum.Count, Pack=pack$Winter.Minimum.Count)
+pack_range_lm <- lm(Range~Pack-1, pack_range)
+pack_range_pred <- predict(pack_range_lm, se = T)
+
+pdf("./figs/Range_vs_pack.pdf", width = 6, height = 2.5)
+par(mar = c(3,3,2,2), mgp = c(1.8, 0.5, 0))
+plot(Range~Pack,pack_range, xlab = "Range", ylab = "Pack counts")
+abline(pack_range_lm)
+polygon(x = c(pack_range$Pack, rev(pack_range$Pack)),
+        y = c(pack_range_pred$fit - qt(0.975,pack_range_pred$df)*(pack_range_pred$se.fit), 
+              rev(pack_range_pred$fit + qt(0.975,pack_range_pred$df)*pack_range_pred$se.fit)),
+        col =  adjustcolor("black", alpha.f = 0.10), border = NA)
+text(x = 55, y = 30000, # Coordinates
+     label = expression("Range = 148.6 * Pack\n p<2e-16, R^2=0.99"))
+
+points(Range~Pack,pack_range[area_pop$Year>=2015,], pch = 7)
+legend("bottomright",legend = c("pre-hunting","post-hunting"), 
+       pch = c(1,7), bg = "white")
+
+dev.off()
+
+
 ## Also in UP of Michigan
 MI_data <- read.csv("../data/MI_UP_Wolf_Density_overtime_1995_2013.csv")
 plot(N~Area.occupied..km2., MI_data, xlab = "Range", ylab = "Population", ylim = c(0,800))
