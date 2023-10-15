@@ -116,8 +116,8 @@ nn <- nrow(simgrid)
 # Set up distance matrix
 distance <- as.matrix(dist(simgrid))
 # Generate random variable
-#set.seed(1234)
-set.seed(42)
+set.seed(1234)
+#set.seed(42)
 phi <- 0.05
 X <- rmvn(1, rep(0, nn), exp(-phi * distance))
 Landscape31 <- matrix(X,100,100)
@@ -147,7 +147,7 @@ for(i in 1:n){
   frontier3[i] <- sum(((patchy_land_frontier[,,i]+patchy_land_growth[,,i])>=1e-5) * (patchy_land_growth[,,i]>=1e-5),na.rm = T)/(sum(Landscape3>1e-5,na.rm=T))
 }
 
-pdf("Figs/patchy42-short.pdf",width = 8,height = 4)
+pdf("Figs/patchy1234-short.pdf",width = 8,height = 4)
 
 #pdf("Figs/patchy42.pdf",width = 8,height = 6)
 namask <- ((patchy_land_growth[,,100]+patchy_land_frontier[,,100])>=1e-5) * (patchy_land_growth[,,100]>=1e-5)
